@@ -6,7 +6,7 @@ import { Menu } from './Menu';
 import { Cart } from './Cart';
 import { OrderHistory } from './OrderHistory';
 import { Admin } from './Admin';
-import { Clipboard, BarChart3, Settings, LogOut } from 'lucide-react';
+import { Clipboard, BarChart3, Settings, LogOut, ShoppingBag, ChevronUp, X } from 'lucide-react';
 
 export const Dashboard: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -17,6 +17,8 @@ export const Dashboard: React.FC = () => {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   // Load cart from localStorage on mount
   useEffect(() => {
@@ -34,6 +36,16 @@ export const Dashboard: React.FC = () => {
   useEffect(() => {
     localStorage.setItem('cart', JSON.stringify(cartItems));
   }, [cartItems]);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
 
   // Fetch menu items
   const fetchMenu = async () => {
@@ -147,6 +159,7 @@ export const Dashboard: React.FC = () => {
 
       setOrders((prevOrders) => [newOrder, ...prevOrders]);
       setCartItems([]);
+      setIsCartOpen(false);
       setSuccess(`Order placed successfully! Order ID: ${orderID}`);
 
       setTimeout(() => {
@@ -165,10 +178,10 @@ export const Dashboard: React.FC = () => {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl bg-purple-100 mx-auto px-4 py-4 flex justify-between items-center">
+        <div className="max-w-7xl bg-yellow-50 mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-3xl font-bold text-black tracking-tight">All@9</h1>
-            <p className="text-gray-500 text-xs font-medium mt-1">Food Cart Management</p>
+            <h1 className="text-3xl font-bold tracking-tight text-red-600">The Crunch Society</h1>
+            <p className="text-gray-500 text-xs font-medium mt-1">food shop management</p>
           </div>
           <button
             onClick={() => {
@@ -225,7 +238,7 @@ export const Dashboard: React.FC = () => {
       
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8 pb-24 lg:pb-8">
         {error && (
           <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-lg">
             {error}
@@ -245,9 +258,10 @@ export const Dashboard: React.FC = () => {
                 items={menuItems}
                 onAddToCart={handleAddToCart}
                 isLoading={menuLoading}
+                orders={orders}
               />
             </div>
-            <div>
+            <div className="hidden lg:block">
               <Cart
                 items={cartItems}
                 onUpdateQuantity={handleUpdateQuantity}
@@ -256,6 +270,57 @@ export const Dashboard: React.FC = () => {
                 onCheckout={handleCheckout}
                 isLoading={checkoutLoading}
               />
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'orders' && cartItems.length > 0 && isMobile && (
+          <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-gray-200 bg-white/95 backdrop-blur">
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="w-full px-4 py-3 flex items-center justify-between text-sm font-medium"
+            >
+              <span className="flex items-center gap-2">
+                <ShoppingBag size={16} />
+                {cartItems.reduce((sum, item) => sum + item.quantity, 0)} item{cartItems.reduce((sum, item) => sum + item.quantity, 0) > 1 ? 's' : ''} in cart
+              </span>
+              <span className="flex items-center gap-2 text-red-600">
+                <span>₹{cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
+                <ChevronUp size={16} />
+              </span>
+            </button>
+          </div>
+        )}
+
+        {activeTab === 'orders' && isMobile && isCartOpen && (
+          <div
+            className="fixed inset-0 z-50 bg-black/40 flex items-end"
+            onClick={() => setIsCartOpen(false)}
+          >
+            <div
+              className="w-full max-h-[92vh] overflow-y-auto rounded-t-2xl bg-white"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="sticky top-0 z-10 flex items-center justify-between border-b border-gray-200 bg-white px-4 py-3">
+                <h2 className="text-lg font-semibold text-black">Your Order</h2>
+                <button
+                  onClick={() => setIsCartOpen(false)}
+                  className="rounded p-1 text-gray-500 hover:bg-gray-100"
+                  aria-label="Close cart"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+              <div className="p-4">
+                <Cart
+                  items={cartItems}
+                  onUpdateQuantity={handleUpdateQuantity}
+                  onRemoveItem={handleRemoveItem}
+                  onClearCart={handleClearCart}
+                  onCheckout={handleCheckout}
+                  isLoading={checkoutLoading}
+                />
+              </div>
             </div>
           </div>
         )}

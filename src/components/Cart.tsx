@@ -175,7 +175,8 @@ export const Cart: React.FC<CartProps> = ({
   if (items.length === 0) {
     return (
       <div className="bg-white border border-gray-200 p-6 text-center rounded">
-        <p className="text-gray-500 text-sm">Cart is empty</p>
+        <p className="text-gray-500 text-sm">Your cart is empty</p>
+        <p className="text-xs text-gray-400 mt-1">Add a few items to start your order</p>
       </div>
     );
   }
@@ -331,20 +332,22 @@ export const Cart: React.FC<CartProps> = ({
       <div className="flex gap-3">
         <button
           onClick={onClearCart}
-          className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-semibold hover:bg-gray-300 transition"
+          className="flex-1 px-4 py-2 bg-gray-200 text-gray-700 rounded font-medium hover:bg-gray-300 transition"
         >
-          Clear Cart
+          Clear
         </button>
         <button
           onClick={() => {
             if (!customerName.trim()) {
-              alert('Please enter customer name');
+              const input = document.querySelector('input[placeholder="Enter customer name"]') as HTMLInputElement | null;
+              input?.focus();
+              input?.select();
               return;
             }
             onCheckout(customerName);
           }}
           disabled={isLoading || !customerName.trim()}
-          className="flex-1 px-4 py-2 bg-linear-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Processing...' : 'Place Order'}
         </button>

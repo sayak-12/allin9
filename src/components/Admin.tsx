@@ -330,7 +330,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
             ) : (
               <div className="space-y-2 max-h-96 overflow-y-auto">
                 {currentMenu.map((item) => (
-                  <div key={item.id} className="bg-purple-50 p-4 rounded-lg">
+                  <div key={item.id} className="bg-yellow-50 p-4 rounded border border-yellow-100">
                     {editingId === item.id ? (
                       <div className="space-y-3">
                         <div>
@@ -341,7 +341,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                             type="text"
                             value={editData.name}
                             onChange={(e) => handleEditChange('name', e.target.value)}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                           />
                         </div>
                         <div>
@@ -354,7 +354,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                             onChange={(e) => handleEditChange('price', e.target.value)}
                             step="0.01"
                             min="0"
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                           />
                         </div>
                         <div>
@@ -365,7 +365,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                             value={editData.description}
                             onChange={(e) => handleEditChange('description', e.target.value)}
                             rows={2}
-                            className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                            className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                           />
                         </div>
                         <div className="flex gap-2">
@@ -392,13 +392,13 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                           {item.description && (
                             <p className="text-sm text-gray-600 mt-1">{item.description}</p>
                           )}
-                          <p className="font-bold text-purple-700 text-lg">₹{item.price.toFixed(2)}</p>
+                          <p className="font-bold text-red-600 text-lg">₹{item.price.toFixed(2)}</p>
                         </div>
                         <div className="flex flex-col items-center">
                           
                           <button
                             onClick={() => handleEditStart(item)}
-                            className="p-2 text-gray-800 hover:bg-purple-200 rounded-lg transition"
+                            className="p-2 text-gray-800 hover:bg-yellow-100 rounded transition"
                             title="Edit item"
                           >
                             <Edit2 size={18} />
@@ -426,7 +426,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
       {activeTab === 'offers' && (
         <>
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 className="text-2xl font-bold text-purple-700 mb-6">Create Offer</h2>
+            <h2 className="text-2xl font-bold text-red-600 mb-6">Create Offer</h2>
 
             <form onSubmit={handleOfferSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -439,7 +439,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     value={offerForm.title}
                     onChange={(e) => setOfferForm({ ...offerForm, title: e.target.value })}
                     placeholder="e.g., Weekend Special"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                     required
                   />
                 </div>
@@ -456,7 +456,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                         discountType: e.target.value as 'percentage' | 'fixed',
                       })
                     }
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                   >
                     <option value="percentage">Percentage (%)</option>
                     <option value="fixed">Fixed (₹)</option>
@@ -474,7 +474,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     placeholder={offerForm.discountType === 'percentage' ? 'e.g., 20' : 'e.g., 100'}
                     step="0.01"
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                     required
                   />
                 </div>
@@ -490,7 +490,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     placeholder="e.g., 500"
                     step="0.01"
                     min="0"
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                   />
                 </div>
 
@@ -502,7 +502,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     type="datetime-local"
                     value={offerForm.startDate}
                     onChange={(e) => setOfferForm({ ...offerForm, startDate: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                     required
                   />
                 </div>
@@ -515,7 +515,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     type="datetime-local"
                     value={offerForm.endDate}
                     onChange={(e) => setOfferForm({ ...offerForm, endDate: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                    className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                     required
                   />
                 </div>
@@ -530,7 +530,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                   onChange={(e) => setOfferForm({ ...offerForm, description: e.target.value })}
                   placeholder="e.g., Buy 2 burgers, get 20% off"
                   rows={2}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-purple-500"
+                  className="w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:border-red-500"
                 />
               </div>
 
@@ -571,7 +571,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
               <button
                 type="submit"
                 disabled={offersLoading}
-                className="w-full bg-linear-to-r from-purple-600 to-purple-700 text-white py-2 rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-black text-white py-2 rounded font-medium hover:bg-gray-800 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {offersLoading ? 'Creating...' : 'Create Offer'}
               </button>
@@ -579,13 +579,13 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
           </div>
 
           <div className="bg-white rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-bold text-purple-700 mb-4">Active Offers</h3>
+            <h3 className="text-xl font-bold text-red-600 mb-4">Active Offers</h3>
             {offers.length === 0 ? (
               <p className="text-gray-500">No offers created yet</p>
             ) : (
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {offers.map((offer) => (
-                  <div key={offer._id} className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-lg border border-purple-200">
+                  <div key={offer._id} className="bg-yellow-50 p-4 rounded border border-yellow-100">
                     <div className="flex justify-between items-start mb-2">
                       <div>
                         <p className="font-bold text-gray-800">{offer.title}</p>
@@ -603,7 +603,7 @@ export const Admin: React.FC<AdminProps> = ({ currentMenu, onMenuUpdated }) => {
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-sm">
                       <div>
                         <p className="text-gray-600 font-semibold">Discount</p>
-                        <p className="text-purple-700 font-bold">
+                        <p className="text-red-600 font-bold">
                           {offer.discountValue}
                           {offer.discountType === 'percentage' ? '%' : '₹'}
                         </p>

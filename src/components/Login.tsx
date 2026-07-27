@@ -29,8 +29,8 @@ export const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-white">
       <div className="bg-white border border-gray-200 p-8 rounded w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-black tracking-tight">All@9</h1>
-          <p className="text-gray-500 mt-2 text-sm font-medium">Food Cart Management</p>
+          <h1 className="text-3xl font-bold tracking-tight text-red-600">The Crunch Society</h1>
+          <p className="text-gray-500 mt-2 text-sm font-medium">food shop management</p>
         </div>
 
         {error && (

@@ -203,7 +203,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                       })}
                     </p>
                   </div>
-                  <p className="text-2xl font-bold text-purple-700">₹{order.totalAmount.toFixed(2)}</p>
+                  <p className="text-2xl font-bold text-red-600">₹{order.totalAmount.toFixed(2)}</p>
                 </div>
 
                 <div className="text-sm text-gray-700">

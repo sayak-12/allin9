@@ -2,7 +2,7 @@
 
 ## Welcome to All@9! 👋
 
-This is your complete guide to the **All@9 Food Cart Management System**. Choose where to start based on your needs.
+This is your complete guide to the **All@9 food shop management System**. Choose where to start based on your needs.
 
 ---
 

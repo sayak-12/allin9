@@ -5,12 +5,13 @@
 }
 
 :root {
-  --edge-primary: #000000;
+  --edge-primary: #111111;
   --edge-secondary: #6b7280;
-  --edge-accent: #7c3aed;
+  --edge-accent: #facc15;
+  --edge-highlight: #dc2626;
   --edge-border: #e5e7eb;
   --edge-bg: #ffffff;
-  --edge-text: #1f2937;
+  --edge-text: #111111;
 }
 
 body {
@@ -23,8 +24,8 @@ input:focus,
 textarea:focus,
 select:focus {
   outline: none;
-  border-color: var(--edge-accent);
-  box-shadow: 0 0 0 1px var(--edge-accent);
+  border-color: var(--edge-highlight);
+  box-shadow: 0 0 0 1px var(--edge-highlight);
 }
 
 button {
@@ -51,18 +52,18 @@ button {
 }
 
 /* Edge theme color adjustments */
-.bg-purple-50 {
-  background-color: #f3f0ff;
+.bg-yellow-50 {
+  background-color: #fefce8;
 }
 
-.bg-purple-100 {
-  background-color: #ede9fe;
+.bg-yellow-100 {
+  background-color: #fef3c7;
 }
 
 .border-gray-200 {
   border-color: #e5e7eb;
 }
 
-.border-purple-200 {
-  border-color: #e9d5ff;
+.border-red-200 {
+  border-color: #fecaca;
 }
