@@ -4,6 +4,13 @@ export interface MenuItem {
   name: string;
   price: number;
   description?: string;
+  inventoryEnabled?: boolean;
+  inventoryItemId?: string | null;
+  inventoryQuantity?: number | null;
+  inventoryMinStockLevel?: number | null;
+  inventoryUnit?: string;
+  inventoryIsUnlimited?: boolean;
+  inventoryStatus?: 'in_stock' | 'low_stock' | 'out_of_stock';
 }
 
 export interface CartItem extends MenuItem {
@@ -12,11 +19,40 @@ export interface CartItem extends MenuItem {
 
 export interface Order {
   id?: string;
+  _id?: string;
   orderID: string;
   customerName: string;
   items: CartItem[];
   totalAmount: number;
   createdAt: string;
+  status?: 'pending' | 'served' | 'cancelled';
+}
+
+export interface InventoryItem {
+  _id?: string;
+  id?: string;
+  itemName: string;
+  sku?: string;
+  category?: string;
+  quantity: number;
+  unit?: string;
+  minStockLevel?: number;
+  costPrice?: number;
+  sellingPrice?: number;
+  supplier?: string;
+  status?: 'in_stock' | 'low_stock' | 'out_of_stock';
+  isUnlimited?: boolean;
+}
+
+export interface RawMaterialItem {
+  _id?: string;
+  id?: string;
+  name: string;
+  quantity: string | number;
+  unit?: string;
+  category?: string;
+  notes?: string;
+  status?: string;
 }
 
 export interface AuthContextType {

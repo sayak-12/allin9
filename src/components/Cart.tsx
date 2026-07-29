@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import type { CartItem, Offer } from '../types';
 import { offerService } from '../services/api';
 import { Gift } from 'lucide-react';
+import { formatPrice } from '../utils/price';
 
 interface CartProps {
   items: CartItem[];
@@ -193,19 +194,24 @@ export const Cart: React.FC<CartProps> = ({
           >
             <div className="flex-1">
               <p className="font-semibold text-gray-900">{item.name}</p>
+              {item.inventoryEnabled && (
+                <p className="text-xs text-gray-600 mt-1">
+                  Stock: {item.inventoryIsUnlimited ? 'Unlimited' : `${item.inventoryQuantity ?? 0} ${item.inventoryUnit || 'pcs'}`}
+                </p>
+              )}
               {(() => {
                 const unitDisc = getItemUnitDiscount(item);
                 if (unitDisc > 0) {
                   const discountedUnit = Math.max(0, item.price - unitDisc);
                   return (
                     <p className="text-sm">
-                      <span className="text-gray-400 line-through mr-2">₹{item.price.toFixed(2)}</span>
-                      <span className="text-green-600 font-semibold">₹{discountedUnit.toFixed(2)}</span>
+                      <span className="text-gray-400 line-through mr-2">₹{formatPrice(item.price)}</span>
+                      <span className="text-green-600 font-semibold">₹{formatPrice(discountedUnit)}</span>
                     </p>
                   );
                 }
 
-                return <p className="text-sm text-gray-600">₹{item.price.toFixed(2)}</p>;
+                return <p className="text-sm text-gray-600">₹{formatPrice(item.price)}</p>;
               })()}
             </div>
             <div className="flex flex-col items-center gap-2">
@@ -237,7 +243,7 @@ export const Cart: React.FC<CartProps> = ({
                 {(() => {
                   const unitDisc = getItemUnitDiscount(item);
                   const discountedUnit = Math.max(0, item.price - unitDisc);
-                  return `₹${(discountedUnit * item.quantity).toFixed(2)}`;
+                  return `₹${formatPrice(discountedUnit * item.quantity)}`;
                 })()}
               </p>
             </div>
@@ -300,12 +306,12 @@ export const Cart: React.FC<CartProps> = ({
         <div className="space-y-2 mb-2">
           <div className="flex justify-between items-center text-gray-700 text-sm">
             <span>Subtotal:</span>
-            <span>₹{subtotal.toFixed(2)}</span>
+            <span>₹{formatPrice(subtotal)}</span>
           </div>
           {discount > 0 && (
             <div className="flex justify-between items-center text-green-600 font-semibold text-sm">
               <span>Discount:</span>
-              <span>-₹{discount.toFixed(2)}</span>
+              <span>-₹{formatPrice(discount)}</span>
             </div>
           )}
         </div>
@@ -325,7 +331,7 @@ export const Cart: React.FC<CartProps> = ({
 
         <div className="flex justify-between items-center text-lg font-bold text-gray-900 pt-2 border-t border-gray-200">
           <span>Total:</span>
-          <span className="text-black">₹{total.toFixed(2)}</span>
+          <span className="text-black">₹{formatPrice(total)}</span>
         </div>
       </div>
 

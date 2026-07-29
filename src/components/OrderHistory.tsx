@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Order, SalesData } from '../types';
+import { salesService } from '../services/api';
+import { formatPrice } from '../utils/price';
 
 interface OrderHistoryProps {
   orders: Order[];
@@ -7,6 +9,7 @@ interface OrderHistoryProps {
 }
 
 export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading }) => {
+  const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
   const [filterType, setFilterType] = useState<'all' | 'today' | 'week' | 'month' | 'custom'>('all');
   const [startDate, setStartDate] = useState('');
@@ -17,6 +20,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
     numberOfOrders: 0,
     averageOrderValue: 0,
   });
+  const [statusMessage, setStatusMessage] = useState('');
 
   const getDateRange = (type: string): { start: Date; end: Date } => {
     const end = new Date();
@@ -44,24 +48,62 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
     return { start, end };
   };
 
+  const getStatusStyles = (status?: string) => {
+    switch (status) {
+      case 'served':
+        return 'border-green-200 bg-green-100 text-green-700';
+      case 'cancelled':
+        return 'border-red-200 bg-red-100 text-red-700';
+      default:
+        return 'border-gray-200 bg-gray-100 text-gray-700';
+    }
+  };
+
+  const handleStatusUpdate = async (order: Order, status: 'served' | 'cancelled') => {
+    try {
+      const id = order._id || order.id;
+      if (!id) return;
+      await salesService.updateOrderStatus(id, status);
+
+      const updatedOrder = { ...order, status };
+      setLocalOrders((prev) => prev.map((item) => {
+        const itemId = item._id || item.id;
+        return itemId === id ? updatedOrder : item;
+      }));
+      setFilteredOrders((prev) => prev.map((item) => {
+        const itemId = item._id || item.id;
+        return itemId === id ? updatedOrder : item;
+      }));
+
+      setStatusMessage(`Order marked as ${status}.`);
+      setTimeout(() => setStatusMessage(''), 2500);
+    } catch {
+      setStatusMessage('Failed to update order status.');
+      setTimeout(() => setStatusMessage(''), 2500);
+    }
+  };
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    let filtered = [...orders];
+    setLocalOrders(orders);
+  }, [orders]);
+
+  useEffect(() => {
+    let filtered = [...localOrders];
 
     if (filterType === 'all') {
-      filtered = orders;
+      filtered = localOrders;
     } else if (filterType === 'custom' && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
       end.setHours(23, 59, 59, 999);
 
-      filtered = orders.filter((order) => {
+      filtered = localOrders.filter((order) => {
         const orderDate = new Date(order.createdAt);
         return orderDate >= start && orderDate <= end;
       });
     } else if (filterType !== 'custom') {
       const { start, end } = getDateRange(filterType);
-      filtered = orders.filter((order) => {
+      filtered = localOrders.filter((order) => {
         const orderDate = new Date(order.createdAt);
         return orderDate >= start && orderDate <= end;
       });
@@ -86,7 +128,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
       numberOfOrders,
       averageOrderValue,
     });
-  }, [filterType, startDate, endDate, customerNameFilter, orders]);
+  }, [filterType, startDate, endDate, customerNameFilter, localOrders]);
 
   if (isLoading) {
     return (
@@ -102,7 +144,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         <div className="bg-white border border-gray-200 rounded p-6">
           <p className="text-gray-600 text-xs font-medium mb-2 uppercase">Total Sales</p>
-          <p className="text-2xl font-bold text-black">₹{salesData.totalSales.toFixed(2)}</p>
+          <p className="text-2xl font-bold text-black">₹{formatPrice(salesData.totalSales)}</p>
         </div>
         <div className="bg-white border border-gray-200 rounded p-6">
           <p className="text-gray-600 text-xs font-medium mb-2 uppercase">Total Orders</p>
@@ -111,7 +153,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
         <div className="bg-white border border-gray-200 rounded p-6">
           <p className="text-gray-600 text-xs font-medium mb-2 uppercase">Avg Order Value</p>
           <p className="text-2xl font-bold text-black">
-            ₹{salesData.averageOrderValue.toFixed(2)}
+            ₹{formatPrice(salesData.averageOrderValue)}
           </p>
         </div>
       </div>
@@ -177,6 +219,12 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
         )}
       </div>
 
+      {statusMessage && (
+        <div className="mb-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
+          {statusMessage}
+        </div>
+      )}
+
       {/* Orders List */}
       <div className="bg-white border border-gray-200 rounded p-6">
         <h3 className="text-lg font-bold text-black mb-4">Orders ({filteredOrders.length})</h3>
@@ -186,7 +234,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
         ) : (
           <div className="space-y-4 max-h-96 overflow-y-auto">
             {filteredOrders.map((order) => (
-              <div key={order.id} className="border-l-4 border-black bg-gray-50 p-4 rounded">
+              <div key={order.id} className={`border-l-4 ${order.status === 'served' ? 'border-green-500' : order.status === 'cancelled' ? 'border-red-500' : 'border-black-500'} bg-gray-50 p-4 rounded`}>
                 <div className="flex justify-between items-start mb-2 flex-wrap">
                   <div>
                     <p className="text-gray-900">Order #{order.orderID}</p>
@@ -202,8 +250,32 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                         minute: '2-digit',
                       })}
                     </p>
+                    <span className={`mt-2 inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold uppercase tracking-wide ${getStatusStyles(order.status)}`}>
+                      {order.status || 'pending'}
+                    </span>
                   </div>
-                  <p className="text-2xl font-bold text-red-600">₹{order.totalAmount.toFixed(2)}</p>
+                  {
+                    order.status !== 'served' && order.status !== 'cancelled' && (
+                      <div className="flex flex-col items-end gap-2">
+                    <p className="text-2xl font-bold text-red-600">₹{formatPrice(order.totalAmount)}</p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleStatusUpdate(order, 'served')}
+                        className="rounded bg-green-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-green-300"
+                      >
+                        Serve
+                      </button>
+                      <button
+                        onClick={() => handleStatusUpdate(order, 'cancelled')}
+                        className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                  </div>
+                    )
+                  }
+                  
                 </div>
 
                 <div className="text-sm text-gray-700">
@@ -211,7 +283,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                   <ul className="list-disc list-inside">
                     {order.items.map((item, idx) => (
                       <li key={idx}>
-                        {item.name} × {item.quantity} = ₹{(item.price * item.quantity).toFixed(2)}
+                        {item.name} × {item.quantity} = ₹{formatPrice(item.price * item.quantity)}
                       </li>
                     ))}
                   </ul>

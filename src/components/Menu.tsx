@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { MenuItem, Order } from '../types';
 import { Search, X } from 'lucide-react';
+import { formatPrice } from '../utils/price';
 
 interface MenuProps {
   items: MenuItem[];
@@ -93,8 +94,8 @@ export const Menu: React.FC<MenuProps> = ({ items, onAddToCart, isLoading, order
                   <p className="text-sm text-gray-600 mb-3 line-clamp-2">{item.description}</p>
                 )}
 
-                <div className="flex items-center justify-between">
-                  <span className="text-lg font-bold text-black">₹{item.price.toFixed(2)}</span>
+                <div className="flex items-center justify-between mb-3">
+                  <span className="text-lg font-bold text-black">₹{formatPrice(item.price)}</span>
                   <button
                     onClick={() => onAddToCart(item)}
                     className="px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition-colors text-sm"
@@ -102,6 +103,15 @@ export const Menu: React.FC<MenuProps> = ({ items, onAddToCart, isLoading, order
                     Add
                   </button>
                 </div>
+                {item.inventoryEnabled ? (
+                  <div className="text-xs text-gray-600">
+                    <span className="font-semibold">Stock:</span>{' '}
+                    {item.inventoryIsUnlimited ? 'Unlimited' : `${item.inventoryQuantity ?? 0} ${item.inventoryUnit || 'pcs'}`}
+                    {item.inventoryStatus && ` • ${item.inventoryStatus.replace('_', ' ')}`}
+                  </div>
+                ) : (
+                  <div className="text-xs text-gray-500">Inventory tracking off</div>
+                )}
               </div>
             </div>
           ))}

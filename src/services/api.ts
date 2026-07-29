@@ -24,10 +24,24 @@ export const authService = {
 
 export const menuService = {
   fetchMenu: () => api.get('/fetchmenu'),
-  addToMenu: (item: { name: string; price: number; description?: string }) =>
-    api.post('/addToMenu', item),
-  updateMenuItem: (id: string, item: { name: string; price: number; description?: string }) =>
-    api.put(`/updateMenuItem/${id}`, item),
+  addToMenu: (item: {
+    name: string;
+    price: number;
+    description?: string;
+    inventoryQuantity?: number | null;
+    inventoryMinStockLevel?: number | null;
+    inventoryUnit?: string;
+    inventoryIsUnlimited?: boolean;
+  }) => api.post('/addToMenu', item),
+  updateMenuItem: (id: string, item: {
+    name: string;
+    price: number;
+    description?: string;
+    inventoryQuantity?: number | null;
+    inventoryMinStockLevel?: number | null;
+    inventoryUnit?: string;
+    inventoryIsUnlimited?: boolean;
+  }) => api.put(`/updateMenuItem/${id}`, item),
   deleteMenuItem: (id: string) =>
     api.delete(`/deleteMenuItem/${id}`),
 };
@@ -37,6 +51,35 @@ export const salesService = {
     api.post('/addToSales', order),
   getSalesHistory: (filters?: any) =>
     api.get('/getSalesHistory', { params: filters }),
+  updateOrderStatus: (id: string, status: 'served' | 'cancelled') =>
+    api.patch(`/orders/${id}/status`, { status }),
+};
+
+export const inventoryService = {
+  getInventoryItems: () => api.get('/inventory/items'),
+  adjustStock: (id: string, adjustment: number) =>
+    api.patch(`/inventory/items/${id}/stock`, { adjustment }),
+};
+
+export const rawMaterialService = {
+  getRawMaterials: () => api.get('/raw-materials'),
+  createRawMaterial: (material: {
+    name: string;
+    quantity: string | number;
+    unit: string;
+    category?: string;
+    notes?: string;
+    status?: string;
+  }) => api.post('/raw-materials', material),
+  updateRawMaterial: (id: string, material: Partial<{
+    name: string;
+    quantity: string | number;
+    unit: string;
+    category?: string;
+    notes?: string;
+    status?: string;
+  }>) => api.put(`/raw-materials/${id}`, material),
+  deleteRawMaterial: (id: string) => api.delete(`/raw-materials/${id}`),
 };
 
 export const offerService = {

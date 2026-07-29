@@ -7,6 +7,7 @@ import { Cart } from './Cart';
 import { OrderHistory } from './OrderHistory';
 import { Admin } from './Admin';
 import { Clipboard, BarChart3, Settings, LogOut, ShoppingBag, ChevronUp, X } from 'lucide-react';
+import { formatPrice } from '../utils/price';
 
 export const Dashboard: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
@@ -86,9 +87,26 @@ export const Dashboard: React.FC = () => {
   }, []);
 
   const handleAddToCart = (item: MenuItem) => {
+    const availableStock = item.inventoryEnabled && !item.inventoryIsUnlimited && item.inventoryQuantity !== null && item.inventoryQuantity !== undefined
+      ? item.inventoryQuantity
+      : Number.POSITIVE_INFINITY;
+
+    const existingItem = cartItems.find((cartItem) => cartItem.id === item.id);
+    const currentQty = existingItem?.quantity ?? 0;
+
+    if (availableStock !== Number.POSITIVE_INFINITY && currentQty + 1 > availableStock) {
+      setError(`Only ${availableStock} ${item.inventoryUnit || 'unit'}${availableStock === 1 ? '' : 's'} available.`);
+      return;
+    }
+
+    if (availableStock === 0) {
+      setError('This item is out of stock.');
+      return;
+    }
+
     setCartItems((prevItems) => {
-      const existingItem = prevItems.find((cartItem) => cartItem.id === item.id);
-      if (existingItem) {
+      const existingCartItem = prevItems.find((cartItem) => cartItem.id === item.id);
+      if (existingCartItem) {
         return prevItems.map((cartItem) =>
           cartItem.id === item.id
             ? { ...cartItem, quantity: cartItem.quantity + 1 }
@@ -160,14 +178,16 @@ export const Dashboard: React.FC = () => {
       setOrders((prevOrders) => [newOrder, ...prevOrders]);
       setCartItems([]);
       setIsCartOpen(false);
+      await fetchMenu();
       setSuccess(`Order placed successfully! Order ID: ${orderID}`);
 
       setTimeout(() => {
         setSuccess('');
         setActiveTab('history');
       }, 2000);
-    } catch (err) {
-      setError('Failed to place order. Please try again.');
+    } catch (err: any) {
+      const backendMessage = err?.response?.data?.message || err?.response?.data?.error || err?.message;
+      setError(backendMessage || 'Failed to place order. Please try again.');
       console.error(err);
     } finally {
       setCheckoutLoading(false);
@@ -285,7 +305,7 @@ export const Dashboard: React.FC = () => {
                 {cartItems.reduce((sum, item) => sum + item.quantity, 0)} item{cartItems.reduce((sum, item) => sum + item.quantity, 0) > 1 ? 's' : ''} in cart
               </span>
               <span className="flex items-center gap-2 text-red-600">
-                <span>₹{cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}</span>
+                <span>₹{formatPrice(cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0))}</span>
                 <ChevronUp size={16} />
               </span>
             </button>
