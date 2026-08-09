@@ -17,6 +17,17 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      window.dispatchEvent(new Event('auth:expired'));
+    }
+
+    return Promise.reject(error);
+  }
+);
+
 export const authService = {
   login: (mobileNumber: string, password: string) =>
     api.post('/login', { mobileNumber, password }),
@@ -47,7 +58,7 @@ export const menuService = {
 };
 
 export const salesService = {
-  addToSales: (order: { customerName: string; items: any[]; totalAmount: number }) =>
+  addToSales: (order: { customerName?: string; orderDate: string; items: any[]; totalAmount: number }) =>
     api.post('/addToSales', order),
   getSalesHistory: (filters?: any) =>
     api.get('/getSalesHistory', { params: filters }),

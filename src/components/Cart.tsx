@@ -10,9 +10,15 @@ interface CartProps {
   onUpdateQuantity: (itemId: string | undefined, quantity: number) => void;
   onRemoveItem: (itemId: string | undefined) => void;
   onClearCart: () => void;
-  onCheckout: (customerName: string) => void;
+  onCheckout: (customerName: string, orderDate: string) => void;
   isLoading: boolean;
 }
+
+const getTodayDateValue = () => {
+  const now = new Date();
+  const localDate = new Date(now.getTime() - now.getTimezoneOffset() * 60000);
+  return localDate.toISOString().slice(0, 10);
+};
 
 export const Cart: React.FC<CartProps> = ({
   items,
@@ -23,6 +29,7 @@ export const Cart: React.FC<CartProps> = ({
   isLoading,
 }) => {
   const [customerName, setCustomerName] = React.useState('');
+  const [orderDate, setOrderDate] = React.useState(getTodayDateValue());
   const [offers, setOffers] = useState<Offer[]>([]);
   const [enabledOffers, setEnabledOffers] = useState<string[]>([]);
   const [offersLoading, setOffersLoading] = useState(false);
@@ -318,13 +325,25 @@ export const Cart: React.FC<CartProps> = ({
 
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Customer Name *
+            Customer Name
           </label>
           <input
             type="text"
             value={customerName}
             onChange={(e) => setCustomerName(e.target.value)}
             placeholder="Enter customer name"
+            className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm"
+          />
+        </div>
+
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Order Date
+          </label>
+          <input
+            type="date"
+            value={orderDate}
+            onChange={(e) => setOrderDate(e.target.value || getTodayDateValue())}
             className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm"
           />
         </div>
@@ -344,15 +363,9 @@ export const Cart: React.FC<CartProps> = ({
         </button>
         <button
           onClick={() => {
-            if (!customerName.trim()) {
-              const input = document.querySelector('input[placeholder="Enter customer name"]') as HTMLInputElement | null;
-              input?.focus();
-              input?.select();
-              return;
-            }
-            onCheckout(customerName);
+            onCheckout(customerName, orderDate || getTodayDateValue());
           }}
-          disabled={isLoading || !customerName.trim()}
+          disabled={isLoading}
           className="flex-1 px-4 py-2 bg-black text-white rounded font-medium hover:bg-gray-800 transition disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isLoading ? 'Processing...' : 'Place Order'}

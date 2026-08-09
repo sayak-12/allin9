@@ -143,7 +143,7 @@ export const Dashboard: React.FC = () => {
     return `ORD-${Date.now()}-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
   };
 
-  const handleCheckout = async (customerName: string) => {
+  const handleCheckout = async (customerName: string, orderDate: string) => {
     if (cartItems.length === 0) {
       setError('Cart is empty');
       return;
@@ -156,9 +156,11 @@ export const Dashboard: React.FC = () => {
     try {
       const total = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
       const orderID = generateOrderID();
+      const normalizedCustomerName = customerName.trim();
 
       const orderPayload = {
-        customerName,
+        customerName: normalizedCustomerName || '',
+        orderDate,
         items: cartItems,
         totalAmount: total,
       };
@@ -169,7 +171,8 @@ export const Dashboard: React.FC = () => {
       const newOrder: Order = {
         id: orderID,
         orderID,
-        customerName,
+        customerName: normalizedCustomerName || 'Guest',
+        orderDate,
         items: cartItems,
         totalAmount: total,
         createdAt: new Date().toISOString(),
@@ -183,7 +186,6 @@ export const Dashboard: React.FC = () => {
 
       setTimeout(() => {
         setSuccess('');
-        setActiveTab('history');
       }, 2000);
     } catch (err: any) {
       const backendMessage = err?.response?.data?.message || err?.response?.data?.error || err?.message;

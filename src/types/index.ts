@@ -22,6 +22,7 @@ export interface Order {
   _id?: string;
   orderID: string;
   customerName: string;
+  orderDate?: string;
   items: CartItem[];
   totalAmount: number;
   createdAt: string;
