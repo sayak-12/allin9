@@ -64,6 +64,9 @@ export const salesService = {
     api.get('/getSalesHistory', { params: filters }),
   updateOrderStatus: (id: string, status: 'served' | 'cancelled') =>
     api.patch(`/orders/${id}/status`, { status }),
+  deleteOrder: (id: string) =>
+    api.delete(`/orders/${id}`),
+  serveAllOrders: () => api.patch('/orders/mark-all-served'),
 };
 
 export const inventoryService = {

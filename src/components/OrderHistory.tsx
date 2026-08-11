@@ -83,6 +83,43 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
     }
   };
 
+  const handleServeAllOrders = async () => {
+    try {
+      await salesService.serveAllOrders();
+      setLocalOrders((prev) => prev.map((order) => ({ ...order, status: 'served' })));
+      setFilteredOrders((prev) => prev.map((order) => ({ ...order, status: 'served' })));
+      setStatusMessage('All orders marked as served.');
+      setTimeout(() => setStatusMessage(''), 2500);
+    } catch {
+      setStatusMessage('Failed to serve all orders. Please try again.');
+      setTimeout(() => setStatusMessage(''), 2500);
+    }
+  };
+
+  const handleDeleteOrder = async (order: Order) => {
+    try {
+      const id = order._id || order.id;
+      if (!id) return;
+      if (!window.confirm('Are you sure you want to delete this order?')) return;
+
+      await salesService.deleteOrder(id);
+      setLocalOrders((prev) => prev.filter((item) => {
+        const itemId = item._id || item.id;
+        return itemId !== id;
+      }));
+      setFilteredOrders((prev) => prev.filter((item) => {
+        const itemId = item._id || item.id;
+        return itemId !== id;
+      }));
+
+      setStatusMessage('Order deleted successfully.');
+      setTimeout(() => setStatusMessage(''), 2500);
+    } catch {
+      setStatusMessage('Failed to delete order. Please try again.');
+      setTimeout(() => setStatusMessage(''), 2500);
+    }
+  };
+
   useEffect(() => {
     setLocalOrders(orders);
   }, [orders]);
@@ -98,13 +135,13 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
       end.setHours(23, 59, 59, 999);
 
       filtered = localOrders.filter((order) => {
-        const orderDate = new Date(order.createdAt);
+        const orderDate = new Date(order.orderDate || order.createdAt);
         return orderDate >= start && orderDate <= end;
       });
     } else if (filterType !== 'custom') {
       const { start, end } = getDateRange(filterType);
       filtered = localOrders.filter((order) => {
-        const orderDate = new Date(order.createdAt);
+        const orderDate = new Date(order.orderDate || order.createdAt);
         return orderDate >= start && orderDate <= end;
       });
     }
@@ -227,7 +264,15 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
 
       {/* Orders List */}
       <div className="bg-white border border-gray-200 rounded p-6">
-        <h3 className="text-lg font-bold text-black mb-4">Orders ({filteredOrders.length})</h3>
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h3 className="text-lg font-bold text-black">Orders ({filteredOrders.length})</h3>
+          <button
+            onClick={handleServeAllOrders}
+            className="rounded bg-green-600 px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
+          >
+            Serve All Orders
+          </button>
+        </div>
 
         {filteredOrders.length === 0 ? (
           <p className="text-gray-500 text-center py-8 text-sm">No orders found for the selected period</p>
@@ -242,7 +287,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                       Customer: <span className="font-semibold">{order.customerName}</span>
                     </p>
                     <p className="text-sm text-gray-600">
-                      {new Date(order.createdAt).toLocaleDateString('en-IN', {
+                      {new Date(order.orderDate || order.createdAt).toLocaleDateString('en-IN', {
                         year: 'numeric',
                         month: 'short',
                         day: 'numeric',
@@ -270,6 +315,12 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                         className="rounded bg-red-600 px-3 py-1.5 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-red-300"
                       >
                         Cancel
+                      </button>
+                      <button
+                        onClick={() => handleDeleteOrder(order)}
+                        className="rounded bg-gray-800 px-3 py-1.5 text-sm font-semibold text-white hover:bg-gray-900 disabled:cursor-not-allowed disabled:bg-gray-400"
+                      >
+                        Delete
                       </button>
                     </div>
                   </div>
