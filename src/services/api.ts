@@ -116,4 +116,23 @@ export const offerService = {
     api.delete(`/deleteOffer/${id}`),
 };
 
+export const expenseService = {
+  addDailyExpense: (expense: {
+    price: number;
+    description: string;
+    givenBy: 'sayan' | 'sayak' | 'dipu' | 'pratick' | 'shop_cash';
+    date: string;
+  }) => api.post('/addDailyExpense', expense),
+  getDailyExpenses: (filters?: { date?: string; givenBy?: string }) =>
+    api.get('/getDailyExpenses', { params: filters }),
+  updateDailyExpense: (id: string, expense: {
+    price?: number;
+    description?: string;
+    givenBy?: 'sayan' | 'sayak' | 'dipu' | 'pratick' | 'shop_cash';
+    date?: string;
+  }) => api.put(`/updateDailyExpense/${id}`, expense),
+  deleteDailyExpense: (id: string) =>
+    api.delete(`/deleteDailyExpense/${id}`),
+};
+
 export default api;

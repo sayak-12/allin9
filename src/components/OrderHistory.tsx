@@ -11,9 +11,10 @@ interface OrderHistoryProps {
 export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading }) => {
   const [localOrders, setLocalOrders] = useState<Order[]>(orders);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>(orders);
-  const [filterType, setFilterType] = useState<'all' | 'today' | 'week' | 'month' | 'custom'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'today' | 'week' | 'month' | '1-day' | 'custom'>('all');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
+  const [singleDate, setSingleDate] = useState('');
   const [customerNameFilter, setCustomerNameFilter] = useState('');
   const [salesData, setSalesData] = useState<SalesData>({
     totalSales: 0,
@@ -129,6 +130,17 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
 
     if (filterType === 'all') {
       filtered = localOrders;
+    } else if (filterType === '1-day' && singleDate) {
+      const selectedDate = new Date(singleDate);
+      selectedDate.setHours(0, 0, 0, 0);
+      const nextDay = new Date(selectedDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+
+      filtered = localOrders.filter((order) => {
+        const orderDate = new Date(order.orderDate || order.createdAt);
+        orderDate.setHours(0, 0, 0, 0);
+        return orderDate.getTime() === selectedDate.getTime();
+      });
     } else if (filterType === 'custom' && startDate && endDate) {
       const start = new Date(startDate);
       const end = new Date(endDate);
@@ -138,7 +150,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
         const orderDate = new Date(order.orderDate || order.createdAt);
         return orderDate >= start && orderDate <= end;
       });
-    } else if (filterType !== 'custom') {
+    } else if (filterType !== 'custom' && filterType !== '1-day') {
       const { start, end } = getDateRange(filterType);
       filtered = localOrders.filter((order) => {
         const orderDate = new Date(order.orderDate || order.createdAt);
@@ -165,7 +177,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
       numberOfOrders,
       averageOrderValue,
     });
-  }, [filterType, startDate, endDate, customerNameFilter, localOrders]);
+  }, [filterType, startDate, endDate, singleDate, customerNameFilter, localOrders]);
 
   if (isLoading) {
     return (
@@ -200,17 +212,17 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
         <h2 className="text-xl font-bold text-black mb-4">Filter Orders</h2>
 
         <div className="flex flex-wrap gap-2 mb-4">
-          {['all', 'today', 'week', 'month', 'custom'].map((type) => (
+          {['all', 'today', 'week', 'month', '1-day', 'custom'].map((type) => (
             <button
               key={type}
-              onClick={() => setFilterType(type as 'all' | 'today' | 'week' | 'month' | 'custom')}
+              onClick={() => setFilterType(type as 'all' | 'today' | 'week' | 'month' | '1-day' | 'custom')}
               className={`px-3 py-2 rounded font-medium text-sm transition-all ${
                 filterType === type
                   ? 'bg-black text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              {type.charAt(0).toUpperCase() + type.slice(1)}
+              {type === '1-day' ? '1-Day' : type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
@@ -249,6 +261,22 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
                 type="date"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm"
+              />
+            </div>
+          </div>
+        )}
+
+        {filterType === '1-day' && (
+          <div className="flex flex-wrap gap-4">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Select Date
+              </label>
+              <input
+                type="date"
+                value={singleDate}
+                onChange={(e) => setSingleDate(e.target.value)}
                 className="w-full px-3 py-2 border border-gray-200 rounded focus:outline-none focus:border-black focus:ring-1 focus:ring-black text-sm"
               />
             </div>

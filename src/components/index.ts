@@ -4,3 +4,4 @@ export { Menu } from './Menu';
 export { Cart } from './Cart';
 export { OrderHistory } from './OrderHistory';
 export { Admin } from './Admin';
+export { DailyExpenses } from './DailyExpenses';

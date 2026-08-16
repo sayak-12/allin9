@@ -106,7 +106,7 @@ export const Menu: React.FC<MenuProps> = ({ items, onAddToCart, isLoading, order
                 {item.inventoryEnabled ? (
                   <div className="text-xs text-gray-600">
                     <span className="font-semibold">Stock:</span>{' '}
-                    {item.inventoryIsUnlimited ? 'Unlimited' : `${item.inventoryQuantity ?? 0} ${item.inventoryUnit || 'pcs'}`}
+                    {item.inventoryIsUnlimited ? 'Unlimited' : `${item.inventoryCount !== null && item.inventoryCount !== undefined ? item.inventoryCount : item.inventoryQuantity ?? 0} ${item.inventoryUnit || 'pcs'}`}
                     {item.inventoryStatus && ` • ${item.inventoryStatus.replace('_', ' ')}`}
                   </div>
                 ) : (

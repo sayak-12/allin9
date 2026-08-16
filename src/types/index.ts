@@ -7,6 +7,7 @@ export interface MenuItem {
   inventoryEnabled?: boolean;
   inventoryItemId?: string | null;
   inventoryQuantity?: number | null;
+  inventoryCount?: number | null; // Current count from inventory
   inventoryMinStockLevel?: number | null;
   inventoryUnit?: string;
   inventoryIsUnlimited?: boolean;
@@ -83,4 +84,14 @@ export interface Offer {
   maxUsage?: number;
   active?: boolean;
   createdBy?: string;
+}
+
+export interface DailyExpense {
+  _id?: string;
+  price: number;
+  description: string;
+  givenBy: 'sayan' | 'sayak' | 'dipu' | 'pratick' | 'shop_cash';
+  date: string;
+  createdAt?: string;
+  updatedAt?: string;
 }

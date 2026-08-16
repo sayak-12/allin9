@@ -6,14 +6,15 @@ import { Menu } from './Menu';
 import { Cart } from './Cart';
 import { OrderHistory } from './OrderHistory';
 import { Admin } from './Admin';
-import { Clipboard, BarChart3, Settings, LogOut, ShoppingBag, ChevronUp, X } from 'lucide-react';
+import { DailyExpenses } from './DailyExpenses';
+import { Clipboard, BarChart3, Settings, LogOut, ShoppingBag, ChevronUp, X, DollarSign } from 'lucide-react';
 import { formatPrice } from '../utils/price';
 
 export const Dashboard: React.FC = () => {
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
-  const [activeTab, setActiveTab] = useState<'orders' | 'history' | 'admin'>('orders');
+  const [activeTab, setActiveTab] = useState<'orders' | 'history' | 'expenses' | 'admin'>('orders');
   const [menuLoading, setMenuLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [error, setError] = useState('');
@@ -242,6 +243,17 @@ export const Dashboard: React.FC = () => {
             <span>Order History</span>
           </button>
           <button
+            onClick={() => setActiveTab('expenses')}
+            className={`py-4 px-0 font-medium transition-all border-b-2 flex items-center gap-2 text-sm ${
+              activeTab === 'expenses'
+                ? 'border-black text-black'
+                : 'border-transparent text-gray-500 hover:text-black'
+            }`}
+          >
+            <DollarSign size={18} />
+            <span>Expenses</span>
+          </button>
+          <button
             onClick={() => setActiveTab('admin')}
             className={`py-4 px-0 font-medium transition-all border-b-2 flex items-center gap-2 text-sm ${
               activeTab === 'admin'
@@ -349,6 +361,10 @@ export const Dashboard: React.FC = () => {
 
         {activeTab === 'history' && (
           <OrderHistory orders={orders} isLoading={false} />
+        )}
+
+        {activeTab === 'expenses' && (
+          <DailyExpenses />
         )}
 
         {activeTab === 'admin' && (
