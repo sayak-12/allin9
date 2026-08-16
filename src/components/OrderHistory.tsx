@@ -269,7 +269,7 @@ export const OrderHistory: React.FC<OrderHistoryProps> = ({ orders, isLoading })
 
         {filterType === '1-day' && (
           <div className="flex flex-wrap gap-4">
-            <div className="flex-1 min-w-[200px]">
+            <div className="flex-1 min-w-50">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Select Date
               </label>

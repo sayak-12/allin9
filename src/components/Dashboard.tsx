@@ -49,12 +49,19 @@ export const Dashboard: React.FC = () => {
     return () => window.removeEventListener('resize', updateViewport);
   }, []);
 
+  const normalizeListResponse = (payload: any) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.orders)) return payload.orders;
+    return [];
+  };
+
   // Fetch menu items
   const fetchMenu = async () => {
     try {
       setMenuLoading(true);
       const response = await menuService.fetchMenu();
-      const items = response.data || [];
+      const items = normalizeListResponse(response.data);
       // Ensure each item has a unique display ID for cart matching
       // Keep original _id for backend operations (edit/delete)
       const itemsWithIds = items.map((item: any) => ({
@@ -75,7 +82,7 @@ export const Dashboard: React.FC = () => {
   const fetchOrders = async () => {
     try {
       const response = await salesService.getSalesHistory();
-      setOrders(response.data || []);
+      setOrders(normalizeListResponse(response.data));
     } catch (err) {
       console.error('Failed to fetch order history:', err);
     }

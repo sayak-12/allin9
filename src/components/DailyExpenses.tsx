@@ -58,11 +58,18 @@ export const DailyExpenses: React.FC = () => {
     }
   }, [success, error]);
 
+  const normalizeListResponse = (payload: any) => {
+    if (Array.isArray(payload)) return payload;
+    if (Array.isArray(payload?.data)) return payload.data;
+    if (Array.isArray(payload?.orders)) return payload.orders;
+    return [];
+  };
+
   const fetchExpenses = async () => {
     try {
       setIsLoading(true);
       const response = await expenseService.getDailyExpenses();
-      setExpenses(response.data || []);
+      setExpenses(normalizeListResponse(response.data));
     } catch (err) {
       console.error('Failed to fetch expenses:', err);
       setError('Failed to load expenses');
@@ -75,7 +82,7 @@ export const DailyExpenses: React.FC = () => {
     try {
       setComparisonLoading(true);
       const response = await salesService.getSalesHistory();
-      setOrders(response.data || []);
+      setOrders(normalizeListResponse(response.data));
     } catch (err) {
       console.error('Failed to fetch orders:', err);
     } finally {
@@ -365,7 +372,7 @@ export const DailyExpenses: React.FC = () => {
         {/* Alert Messages */}
         {error && (
           <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded flex items-start gap-2">
-            <AlertCircle size={16} className="text-red-600 mt-0.5 flex-shrink-0" />
+            <AlertCircle size={16} className="text-red-600 mt-0.5 shrink-0" />
             <p className="text-sm text-red-800">{error}</p>
           </div>
         )}
